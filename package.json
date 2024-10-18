@@ -1,0 +1,28 @@
+{
+  "name": "vidtube",
+  "version": "1.0.0",
+  "description": "backend inspired by youtube",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "node",
+    "mongoose",
+    "express",
+    "backend"
+  ],
+  "author": "shivanshu",
+  "license": "ISC",
+  "dependencies": {
+    "env": "^0.0.2",
+    "express": "^4.21.1",
+    "mongoose": "^8.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3"
+  }
+}
