@@ -1,13 +1,12 @@
 import express from "express";
-import env from "dotenv";
 import cors from "cors";
+import dotenv from "dotenv";
 
 const app = express();
 
-env.config({
-  path: "./.env",
+dotenv.config({
+  path: "src/.env",
 });
-
 //common middlewares
 app.use(
   cors({
