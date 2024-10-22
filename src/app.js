@@ -1,12 +1,14 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import multer from "multer";
 
 const app = express();
 
 dotenv.config({
   path: "src/.env",
 });
+
 //common middlewares
 app.use(
   cors({
