@@ -4,5 +4,10 @@ class ErrorResponse extends Error {
     message = "something went wrong",
     error = [],
     stack = ""
-  ) {}
+  ) {
+    this.statusCode = statusCode;
+    this.message = message;
+    this.error = error;
+    this.stack = stack;
+  }
 }
