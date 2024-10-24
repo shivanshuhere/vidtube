@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import { fileURLToPath } from "url";
 
 cloudinary.config({
   cloud_name: "deq5uwgur",
@@ -23,3 +22,5 @@ const uploadOnCloudinary = async (localFilePath) => {
     return null;
   }
 };
+
+export default uploadOnCloudinary;
