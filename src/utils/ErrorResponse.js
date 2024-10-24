@@ -11,3 +11,5 @@ class ErrorResponse extends Error {
     this.stack = stack;
   }
 }
+
+export default ErrorResponse;
