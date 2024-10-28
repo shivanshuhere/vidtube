@@ -1,4 +1,4 @@
-class ErrorResponse extends Error {
+class ErrorResponse {
   constructor(
     statusCode,
     message = "something went wrong",
@@ -8,7 +8,11 @@ class ErrorResponse extends Error {
     this.statusCode = statusCode;
     this.message = message;
     this.error = error;
-    this.stack = stack;
+    // if (stack) {
+    //   this.stack = stack;
+    // } else {
+    //   Error.captureStackTrace(this, this.constructor);
+    // }
   }
 }
 
