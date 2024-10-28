@@ -9,7 +9,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   //validation of data fields
   if ([fullName, username, password, email].some((field) => field?.trim === ""))
-    throw new ErrorResponse(400, "Full name is required!");
+    throw new ErrorResponse(400, "All fields are required!");
 
   //user already exist or not
   const exitedUser = await User.findOne({
@@ -20,31 +20,44 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // handle files from multer
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImgLocalPath = req.files?.coverImg[0]?.path;
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const coverImgLocalPath = req.files?.coverImg?.[0]?.path;
 
   if (!avatarLocalPath)
     throw new ErrorResponse(400, "Avatar Image is missing!");
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  let avatar;
+  try {
+    avatar = await uploadOnCloudinary(avatarLocalPath);
+  } catch (error) {
+    console.log("Failed to upload avatar to cloudinary ", error);
+  }
 
   let coverImg = "";
   if (coverImgLocalPath) {
-    coverImg = await uploadOnCloudinary(coverImgLocalPath);
+    try {
+      coverImg = await uploadOnCloudinary(coverImgLocalPath);
+    } catch (error) {
+      console.log("Faild to upload coverImg to cloudinary ", error);
+    }
   }
-
-  const user = await User.create({
-    fullName,
-    avatar: avatar.url,
-    coverImg: coverImg?.url || "",
-    email,
-    password,
-    username: username.toLowerCase(),
-  });
-
-  const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken "
-  );
+  let user;
+  let createdUser;
+  try {
+    user = await User.create({
+      fullName,
+      avatar: avatar.url,
+      coverImg: coverImg?.url || "",
+      email,
+      password,
+      username: username.toLowerCase(),
+    });
+    createdUser = await User.findById(user._id).select(
+      "-password -refreshToken "
+    );
+  } catch (error) {
+    console.log("Failed to create user ", error);
+  }
 
   if (!createdUser)
     throw new ErrorResponse(
