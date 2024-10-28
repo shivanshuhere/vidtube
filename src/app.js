@@ -32,6 +32,6 @@ import userRouter from "./routes/user.routes.js";
 
 // routes
 app.use("/api/v1/healthcheck", healthcheckRouter);
-app.use("/user", registerUser);
+app.use("/user", userRouter);
 
 export { app };
