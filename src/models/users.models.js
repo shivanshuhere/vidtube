@@ -3,7 +3,7 @@ import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const userSchema = Schema(
+const userSchema = new Schema(
   {
     username: {
       type: String,
@@ -54,17 +54,18 @@ const userSchema = Schema(
   }
 );
 
+// hash password
 userSchema.pre("save", async function (next) {
   if (this.modified("password")) return next();
   this.password = bcrypt.hash(this.password, 10);
   next();
 });
 
-userSchema.mehtods.isPasswordCorrect = async function (password) {
+userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.mehtods.generateAccessToken = function () {
+userSchema.methods.generateAccessToken = function () {
   jwt.sign(
     {
       _id: this._id,
@@ -77,7 +78,7 @@ userSchema.mehtods.generateAccessToken = function () {
   );
 };
 
-userSchema.mehtods.generateRefreshToken = function () {
+userSchema.methods.generateRefreshToken = function () {
   jwt.sign(
     {
       _id: this._id,
