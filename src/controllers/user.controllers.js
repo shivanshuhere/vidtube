@@ -2,7 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { User } from "../models/users.models.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, username, password, email } = req.body;
@@ -23,8 +23,9 @@ const registerUser = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
   const coverImgLocalPath = req.files?.coverImg?.[0]?.path;
 
-  if (!avatarLocalPath)
+  if (!avatarLocalPath) {
     throw new ErrorResponse(400, "Avatar Image is missing!");
+  }
 
   let avatar;
   try {
@@ -55,8 +56,11 @@ const registerUser = asyncHandler(async (req, res) => {
     createdUser = await User.findById(user._id).select(
       "-password -refreshToken "
     );
+    console.log("User created successfully !", user);
   } catch (error) {
     console.log("Failed to create user ", error);
+    await deleteOnCloudinary(avatar.public_id);
+    await deleteOnCloudinary(coverImg.public_id);
   }
 
   if (!createdUser)
