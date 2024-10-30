@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import dotenv from "dotenv";
+import ErrorResponse from "./ErrorResponse.js";
 
 dotenv.config({
   path: "src/.env",
@@ -29,4 +30,14 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-export default uploadOnCloudinary;
+const deleteOnCloudinary = async function (id) {
+  try {
+    const response = await cloudinary.uploader.destroy(id);
+    console.log("Deleted assets successfully.", response);
+    return response;
+  } catch (error) {
+    return new ErrorResponse(400, "Failed to delete assets. public id :", id);
+  }
+};
+
+export { uploadOnCloudinary, deleteOnCloudinary };
