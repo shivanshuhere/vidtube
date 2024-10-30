@@ -38,9 +38,7 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
-      unique: true,
-      trim: true,
+      require: true,
     },
     refreshToken: {
       type: String,
@@ -57,6 +55,7 @@ const userSchema = new Schema(
 // hash password
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) return next();
+
   this.password = bcrypt.hash(this.password, 10);
   next();
 });
