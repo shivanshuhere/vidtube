@@ -74,4 +74,35 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "User registered successfully"));
 });
 
+const generateAccessAndRefreshToken = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new ErrorResponse(404, "User not found!");
+  }
+};
+
+const loginUser = asyncHandler(async (req, res) => {
+  const { username, email } = req.body;
+
+  if (!username && !email) {
+    throw new ErrorResponse(400, "Username or email is required!");
+  }
+  let user;
+  user = await User.findOne({ $or: [{ username }, { email }] });
+
+  if (!user) {
+    throw new ErrorResponse(404, "User not found!");
+  }
+
+  const ispasswordCorrect = await user.isPasswordCorrect(req.body.password);
+  if (!ispasswordCorrect) {
+    throw new ErrorResponse(400, "Invalid credentials!");
+  } else {
+    user.generateAccessToken();
+    user.generateRefreshToken();
+    return res.status(200).json(new ApiResponse(200, "Login success", user));
+  }
+});
+
 export { registerUser };
