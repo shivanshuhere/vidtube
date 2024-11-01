@@ -75,10 +75,22 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const generateAccessAndRefreshToken = async (userId) => {
-  const user = await User.findById(userId);
+  try {
+    const user = await User.findById(userId);
 
-  if (!user) {
-    throw new ErrorResponse(404, "User not found!");
+    if (!user) {
+      throw new ErrorResponse(404, "User not found!");
+    }
+
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ErrorResponse(500, "Failed to generate tokens!");
   }
 };
 
@@ -95,14 +107,31 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ErrorResponse(404, "User not found!");
   }
 
-  const ispasswordCorrect = await user.isPasswordCorrect(req.body.password);
+  const ispasswordValid = await user.isPasswordCorrect(req.body.password);
   if (!ispasswordCorrect) {
     throw new ErrorResponse(400, "Invalid credentials!");
   } else {
-    user.generateAccessToken();
-    user.generateRefreshToken();
-    return res.status(200).json(new ApiResponse(200, "Login success", user));
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id
+    );
+    const loggedInUser = User.findById(user._id).select(
+      "-password -refreshToken"
+    );
+
+    if (!loggedInUser)
+      return res.status(404).json(new ApiResponse(404, "User not found"));
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
   }
+
+  return res
+    .status(200)
+    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
+    .json(new ApiResponse(200, "User logged in successfully"));
 });
 
-export { registerUser };
+export { registerUser, loginUser };
